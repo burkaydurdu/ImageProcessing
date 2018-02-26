@@ -12,8 +12,11 @@ import java.io.IOException;
 public class Screen extends JFrame implements ActionListener {
     private JMenuItem imageMenuItem;
     private JMenu open;
-    private JLabel imageBox;
-    private Image image;
+    private JLabel imageBox, newImageBox;
+    private BufferedImage image;
+    private Button grayFormatBtn;
+    private JPanel controlPanel;
+    private ImageControl imageControl;
 
     public Screen() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -22,8 +25,21 @@ public class Screen extends JFrame implements ActionListener {
         JMenuBar menuBar = onCreateMenu();
         this.setJMenuBar(menuBar);
 
+        controlPanel = new JPanel();
+
+        grayFormatBtn = new Button("Gray");
+        grayFormatBtn.addActionListener(this);
+
+        controlPanel.add(grayFormatBtn);
+
         imageBox = new JLabel();
+        newImageBox = new JLabel();
+
+        add(controlPanel, BorderLayout.EAST);
         add(imageBox, BorderLayout.WEST);
+        add(newImageBox, BorderLayout.CENTER);
+
+        imageControl = new ImageControl();
 
         setVisible(true);
     }
@@ -48,15 +64,19 @@ public class Screen extends JFrame implements ActionListener {
             File file = fc.getSelectedFile();
             try {
                 imageBox.setIcon(new ImageIcon(ImageIO.read(file)));
-                BufferedImage image = ImageIO.read(file);
-                getImageAnalysis(image);
+                image = ImageIO.read(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void getImageAnalysis(BufferedImage image) {
+    private void grayFormat() {
+        imageControl.setImage(image);
+        newImageBox.setIcon(new ImageIcon(imageControl.getGrayImage()));
+    }
+
+   /* private void getImageAnalysis(BufferedImage image) {
         int w = image.getWidth();
         int h = image.getHeight();
         System.out.println("width, height: " + w + ", " + h);
@@ -69,20 +89,22 @@ public class Screen extends JFrame implements ActionListener {
                 System.out.println("");
             }
         }
-    }
+    }*/
 
-    public void printPixelARGB(int pixel) {
-        int alpha = (pixel >> 24) & 0xff;
-        int red = (pixel >> 16) & 0xff;
-        int green = (pixel >> 8) & 0xff;
-        int blue = (pixel) & 0xff;
-        System.out.println("argb: " + alpha + ", " + red + ", " + green + ", " + blue);
-    }
+   /* private BufferedImage createdImage(int width, int height, int imageArray[][]) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for(int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
+                image.setRGB(i, j, imageArray[i][j]);
+        return image;
+    }*/
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(imageMenuItem)) {
             openFile();
+        } else if(e.getSource().equals(grayFormatBtn)) {
+            grayFormat();
         }
     }
 }
